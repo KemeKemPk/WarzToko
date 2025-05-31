@@ -1,3 +1,12 @@
-{
-  "products": []
-}
+[
+  {
+    "name": "Akun Spotify Premium",
+    "originalPrice": 250000,
+    "promoPrice": 180000,
+    "description": "Garansi 30 hari",
+    "images": [
+      "https://i.imgur.com/contoh1.jpg",
+      "https://i.imgur.com/contoh2.jpg"
+    ]
+  }
+]
