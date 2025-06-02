@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Satu CropzX - Dashboard Gambar & Lokasi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+  :root {
+    --bg-dark: #121212;
+    --card-bg: #1f1f1f;
+    --text-light: #e0e0e0;
+    --accent: #4caf50;
+    --btn-danger: #e53935;
+    --btn-danger-hover: #b71c1c;
+    --shadow: rgba(0,0,0,0.8);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 1rem 2rem;
+    font-weight: 600;
+    font-size: 1.7rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #333;
+    text-align: center;
+    user-select: none;
+    background: linear-gradient(90deg, #1a5f1a, #4caf50);
+    color: white;
+  }
+
+  main {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    gap: 1.3rem;
+    overflow-y: auto;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+  }
+  .card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 14px 30px var(--shadow);
+  }
+
+  .img-container {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+
+  .img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .card:hover .img-container img {
+    transform: scale(1.1);
+  }
+
+  .info {
+    padding: 1rem 1.2rem 1.4rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .details {
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
+    color: #bbb;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .details strong {
+    color: var(--accent);
+  }
+
+  .location {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+  }
+
+  .location a {
+    color: #4caf50;
+    text-decoration: none;
+  }
+
+  .location a:hover {
+    text-decoration: underline;
+  }
+
+  footer {
+    padding: 0.7rem 2rem;
+    font-size: 0.9rem;
+    color: #555;
+    border-top: 1px solid #333;
+    text-align: center;
+  }
+
+  button.delete-btn {
+    background: var(--btn-danger);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px var(--btn-danger);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: flex-start;
+    user-select: none;
+  }
+  button.delete-btn:hover {
+    background: var(--btn-danger-hover);
+    transform: scale(1.1);
+  }
+  button.delete-btn:active {
+    transform: scale(0.95);
+  }
+
+  .no-data {
+    grid-column: 1/-1;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #777;
+    margin-top: 5rem;
+    user-select: none;
+  }
+
+  .pin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .pin-modal.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .pin-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .pin-container h3 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+
+  .pin-input {
+    width: 100%;
+    padding: 0.8rem;
+    margin: 1rem 0;
+    border-radius: 8px;
+    border: 2px solid #333;
+    background: #2a2a2a;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 0.2em;
+  }
+
+  .pin-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .pin-buttons button {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .pin-confirm {
+    background: var(--accent);
+    color: white;
+  }
+
+  .pin-cancel {
+    background: #555;
+    color: white;
+  }
+
+  .pin-error {
+    color: var(--btn-danger);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    min-height: 1.2rem;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    } to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+</head>
+<body>
+<header>Satu CropzX - Dashboard Admin Gambar & Lokasi</header>
+<main id="container">
+  <!-- Cards will be appended here -->
+</main>
+<footer>
+  &copy; 2025 Satu CropzX - Sistem Pemantauan Pertanian
+</footer>
+
+<!-- PIN Verification Modal -->
+<div class="pin-modal" id="pinModal">
+  <div class="pin-container">
+    <h3>Verifikasi PIN</h3>
+    <p>Masukkan PIN untuk menghapus data</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="****">
+    <div class="pin-error" id="pinError"></div>
+    <div class="pin-buttons">
+      <button class="pin-cancel" id="pinCancel">Batal</button>
+      <button class="pin-confirm" id="pinConfirm">Konfirmasi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const storageKey = 'binjson_data';
+  const correctPIN = '2903'; // PIN yang benar
+  let currentEntryToDelete = null;
+  let currentCardElement = null;
+
+  // Load data from localStorage
+  function loadData() {
+    const json = localStorage.getItem(storageKey);
+    if (!json) return [];
+    try {
+      return JSON.parse(json);
+    } catch {
+      return [];
+    }
+  }
+
+  // Save data to localStorage
+  function saveData(data) {
+    localStorage.setItem(storageKey, JSON.stringify(data));
+  }
+
+  function formatTimestamp(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString('id-ID');
+  }
+
+  function createCard(entry) {
+    const {id, image, location, timestamp} = entry;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const imgCont = document.createElement('div');
+    imgCont.className = 'img-container';
+
+    const img = document.createElement('img');
+    img.src = image;
+    img.alt = 'Gambar yang diambil';
+
+    imgCont.appendChild(img);
+
+    const info = document.createElement('div');
+    info.className = 'info';
+
+    const details = document.createElement('div');
+    details.className = 'details';
+    details.innerHTML = `<strong>ID:</strong> ${id}<br/>
+                         <strong>Waktu:</strong> ${formatTimestamp(timestamp)}`;
+
+    let locText = 'Lokasi: Tidak tersedia';
+    if (location) {
+      const mapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+      locText = `Lokasi: <a href="${mapsLink}" target="_blank">${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)} (±${location.accuracy ? location.accuracy.toFixed(1) + 'm' : 'N/A'})</a>`;
+    }
+
+    const locationEl = document.createElement('div');
+    locationEl.className = 'location';
+    locationEl.innerHTML = locText;
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = 'Hapus';
+    deleteBtn.title = 'Hapus data ini';
+
+    deleteBtn.onclick = () => {
+      currentEntryToDelete = id;
+      currentCardElement = card;
+      showPinModal();
+    };
+
+    info.appendChild(details);
+    info.appendChild(locationEl);
+    info.appendChild(deleteBtn);
+
+    card.appendChild(imgCont);
+    card.appendChild(info);
+
+    return card;
+  }
+
+  function showPinModal() {
+    const modal = document.getElementById('pinModal');
+    const pinInput = document.getElementById('pinInput');
+    const pinError = document.getElementById('pinError');
+    
+    pinInput.value = '';
+    pinError.textContent = '';
+    modal.classList.add('active');
+    pinInput.focus();
+  }
+
+  function hidePinModal() {
+    const modal = document.getElementById('pinModal');
+    modal.classList.remove('active');
+  }
+
+  function verifyPin() {
+    const pinInput = document.getElementById('pinInput');
+    const pinError = document.getElementById('pinError');
+    
+    if (pinInput.value === correctPIN) {
+      deleteEntry(currentEntryToDelete, currentCardElement);
+      hidePinModal();
+    } else {
+      pinError.textContent = 'PIN salah! Silakan coba lagi.';
+      pinInput.value = '';
+      pinInput.focus();
+    }
+  }
+
+  function deleteEntry(id, cardElement) {
+    let data = loadData();
+    data = data.filter(e => e.id !== id);
+    saveData(data);
+    // Animate removal
+    cardElement.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    cardElement.style.opacity = '0';
+    cardElement.style.transform = 'scale(0.8) translateX(-20px)';
+    setTimeout(() => {
+      cardElement.remove();
+      checkNoData();
+    }, 400);
+  }
+
+  function checkNoData() {
+    const container = document.getElementById('container');
+    if (container.children.length === 0) {
+      const msg = document.createElement('div');
+      msg.className = 'no-data';
+      msg.textContent = 'Tidak ada data yang tersedia.';
+      container.appendChild(msg);
+    }
+  }
+
+  function render() {
+    const container = document.getElementById('container');
+    container.innerHTML = '';
+    const data = loadData();
+    if (data.length === 0) {
+      checkNoData();
+      return;
+    }
+    data.forEach(entry => {
+      const card = createCard(entry);
+      container.appendChild(card);
+    });
+  }
+
+  // Event listeners for PIN modal
+  document.getElementById('pinConfirm').addEventListener('click', verifyPin);
+  document.getElementById('pinCancel').addEventListener('click', hidePinModal);
+  document.getElementById('pinInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      verifyPin();
+    }
+  });
+
+  // Initial render
+  window.onload = () => {
+    render();
+  };
+</script>
+</body>
+</html>
